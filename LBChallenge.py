@@ -20,7 +20,7 @@ class VIP:
     def Healthcheck(self):
         self.avail_member_dict = {}
         for k, v in self.member_dict.items():
-            self.member_dict[k].append(os.system("nc -vw5 -L 1 {} {} ".format(v[0], v[1])))  # takes 1 min and 15 sec for nc to timeout, not 5 sec as I desired. else this would be set to 5/15
+            self.member_dict[k].append(os.system("nc -vw5 -G5 -L 3 {} {} ".format(v[0], v[1])))  #
             if self.member_dict[k][2] == 0:         # instantiate new dictionary with only available members
                 self.avail_member_dict[k] = v
 
@@ -44,7 +44,27 @@ class VIP:
             return self.rr_member
 
     def Errorpage(self):
-        print("Sorry, no members are available.")
+        self.html_text ='''
+        <html>
+            <body>
+                <h1>{}</h1>
+                    <p>There are no members available for this service.</p>
+            </body>
+        </html>
+        '''.format(self.service_name)
+
+        self.html_filename = '/error.html'
+        self.html_cwd_file = os.getcwd() + self.html_filename
+
+        self.html_write = open(self.html_cwd_file, "w")    # create error page
+        self.html_write.write(self.html_text)
+        self.html_write.close()
+
+        self.html_read = open(self.html_cwd_file, "r")    # return error page
+        print(self.html_read.read())
+        self.html_write.close()
+
+        return "Not Available"
 
     def Roundrobin(self):
         self.pickle_open = open(self.pickle_cwd_file, 'rb')
