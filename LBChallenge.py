@@ -7,8 +7,9 @@ import pickle
 
 class VIP:
     def __init__(self):
-        self.config_path='observabilityplatforms.com.yaml'
-        self.vip_yaml=yaml.load(open(self.config_path, 'r', ), Loader=yaml.FullLoader)
+        self.yaml_filename = '/observabilityplatforms.com.yaml'
+        self.config_path= os.getcwd() + self.yaml_filename
+        self.vip_yaml=yaml.load(open(self.config_path, 'r'), Loader=yaml.FullLoader)
 
         #assign values of yaml file to variables
         self.service_name = self.vip_yaml['service']
