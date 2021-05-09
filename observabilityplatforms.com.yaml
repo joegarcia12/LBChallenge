@@ -1,0 +1,11 @@
+---
+service: observabilityplatforms.com
+vip:
+  ip: 127.0.0.1
+  listener_port: 8080
+  pool:
+    members:
+      newrelic.com: [142.251.33.110, 443]
+      splunk.com: [52.5.196.118, 443]
+      datadoghq.com: [52.84.169.4, 443]
+    healthcheck: tcp
