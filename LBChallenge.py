@@ -8,7 +8,7 @@ import pickle
 class VIP:
     def __init__(self):
         self.config_path='observabilityplatforms.com.yaml'
-        self.vip_yaml=yaml.load(open(self.config_path, 'r'))
+        self.vip_yaml=yaml.load(open(self.config_path, 'r', ), Loader=yaml.FullLoader)
 
         #assign values of yaml file to variables
         self.service_name = self.vip_yaml['service']
@@ -31,13 +31,13 @@ class VIP:
 
     def Picklelint(self):
         self.pickle_filename = '/rr_state.pk'
-        self.pickle_cwd = os.getcwd() + self.pickle_filename    # current working directory and filename for last served member
+        self.pickle_cwd_file = os.getcwd() + self.pickle_filename    # current working directory and filename for last served member
+        self.first_rr_member = list(self.avail_member_dict)[0]
 
-        if path.exists(self.pickle_cwd) == False:          # instantiate pickle file, and write first available member to first line
-            with open(self.pickle_cwd, 'wb') as write_pickle:
-                self.picklelint_dump = pickle.dump(list(self.avail_member_dict)[0], write_pickle)
-                print(self.picklelint_dump)
-            return self.picklelint_dump
+        if path.exists(self.pickle_cwd_file) == False:          # instantiate pickle file, and write first available member to first line
+            with open(self.pickle_cwd_file, 'wb+') as write_pickle:
+                pickle.dump(self.first_rr_member, write_pickle)
+            return self.first_rr_member
 
         else:       # pickle file already instantiated
             self.rr_member = self.Roundrobin()
@@ -47,38 +47,44 @@ class VIP:
         print("Sorry, no members are available.")
 
     def Roundrobin(self):
-        self.pickle_open = open(self.pickle_cwd, 'wb+')
+        self.pickle_open = open(self.pickle_cwd_file, 'rb')
         self.pickle_data = pickle.load(self.pickle_open)
+        print("Pickle data within Roundrobin function, type:", self.pickle_data, type(self.pickle_data))
+        self.pickle_open.close()                                # 'rb+' when opening the file wasn't allowing pickle.dump write privileges; closing.
         self.member_total = len(list(self.member_dict))
 
-        # RR Case 1: return the same member if only 1  is available
+        print("If and elif conditions pre-test, self.pickle_data:", self.pickle_data)
+        # RR Case 1: return the same member if only 1 member is available
         if len(self.avail_member_dict) == 1:
-            self.pickle_open.close()
             return list(self.avail_member_dict)[0]
+
+        # RR Case 1.5: return first available member if pickle file is empty or does not match any member (ie was modified somehow)
 
         # RR Case 2: return first available member to complete the 'round-robin' cycle
-        elif self.avail_member_dict[self.pickle_data] == list(self.avail_member_dict)[self.member_total - 1]:
+        elif self.pickle_data == list(self.avail_member_dict.keys())[int(self.member_total -1)]:
+            self.pickle_open = open(self.pickle_cwd_file, 'wb')
+            pickle.dump(list(self.avail_member_dict)[0], self.pickle_open)
             self.pickle_open.close()
             return list(self.avail_member_dict)[0]
-
         # RR Case 3: return next available member between the first and last available member
         else:
-            self.rr_count = 0
-            for service_name in list(self.avail_member_dict):
-                if service_name == list(self.avail_member_dict)[self.rr_count]:
-                    pickle.dump(list(self.avail_member_dict)[self.rr_count + 1], self.pickle_open)
+            print("If and elif conditions failed, self.pickle_data:", self.pickle_data)
+            self.rr_count = int(list(self.avail_member_dict).index(self.pickle_data))
+            print("rr_count value =", self.rr_count)
+            for service_name in list(self.avail_member_dict)[self.rr_count : self.member_total]:
+                print("service_name loop Service, rr_count:", service_name, self.rr_count)
+                if service_name == list(self.avail_member_dict)[self.rr_count]:    # self.rr_count
+                    self.pickle_open = open(self.pickle_cwd_file, 'wb')
+                    self.rr_member = list(self.avail_member_dict)[self.rr_count + 1]     # [self.rr_count + 1]
+                    print('Previous member:', list(self.avail_member_dict)[self.rr_count], 'Served member:', self.rr_member)
+                    pickle.dump(self.rr_member, self.pickle_open)
                     self.pickle_open.close()
-                    return list(self.avail_member_dict)[self.rr_count]
+                    return list(self.avail_member_dict)[self.rr_count + 1]
                 self.rr_count += 1
-
-        # return next available member, depending on state of pickle file
-       # for i in range(0, self.member_total):
-        #    if self.member_dict[self.pickle_readline] == list(self.member_dict)[i]
-         #       return list(self.member_dict)[i+1]
 
 if __name__ == "__main__":
     a = VIP()
-    print(a.service_name)
-    a.Healthcheck()
+    print("Service name:", a.service_name)
+    print("Your load balanced member is:", a.Healthcheck())
 #a =VIP()
 #print(a.vip_ip)
