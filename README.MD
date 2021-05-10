@@ -19,6 +19,13 @@ git@github.com:joegarcia12/LBChallenge.git
 ```
 * Each LBChallenge.py run will generate a 'rr_state.pk' and error.html file in the current working directory. Delete the 'rr_state.pk' file in the event you modify the members within the YAML file.
 ```
+#### Example run ####
+josephrgarcia-mbp:LB josephrgarcia$ python3 LBChallenge.py
+Service name: observabilityplatforms.com
+Connection to 142.251.33.110 port 443 [tcp/https] succeeded!
+Connection to 52.5.196.118 port 443 [tcp/https] succeeded!
+Connection to 52.84.169.4 port 443 [tcp/https] succeeded!
+Your VIP returned member: newrelic.com:443
 
 ```
 
