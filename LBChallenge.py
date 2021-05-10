@@ -3,7 +3,6 @@ import yaml
 import os
 from os import path
 import pickle
-#from collections import OrderedDict
 
 class VIP:
     def __init__(self):
