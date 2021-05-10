@@ -29,7 +29,6 @@ class VIP:
         if self.avail_member_total != 0:   # pass traffic to backend pool member if at least one available member
             return self.Picklelint()
         else:
-            print("Errorpage call, avail_member_total: {}".format(self.avail_member_total))
             return self.Errorpage()    # return error page if no available members
 
     def Picklelint(self):
@@ -76,11 +75,8 @@ class VIP:
 
         except EOFError:        # handles the corner case where the 'rr_state.pk' file exists, but is empty
             self.pickle_data = self.first_rr_member
-            print("Pickle data within Roundrobin function, type:", self.pickle_data, type(self.pickle_data))
         self.pickle_open.close()
 
-
-        print("If and elif conditions pre-test, self.pickle_data:", self.pickle_data)
         # RR Case 1: return the same member if only 1 member is available
         if len(self.avail_member_dict) == 1:
             return list(self.avail_member_dict)[0]
@@ -94,15 +90,11 @@ class VIP:
 
         # RR Case 3: return next available member between the first and last available member
         else:
-            print("If and elif conditions failed, self.pickle_data:", self.pickle_data)
             self.rr_count = int(list(self.avail_member_dict).index(self.pickle_data))
-            print("rr_count value =", self.rr_count)
             for service_name in list(self.avail_member_dict)[self.rr_count : self.avail_member_total]:        # index slicing from current order in dictionary list, to last available member
-                print("service_name loop Service, rr_count:", service_name, self.rr_count)
                 if service_name == list(self.avail_member_dict)[self.rr_count]:
                     self.pickle_open = open(self.pickle_cwd_file, 'wb')
                     self.rr_member = list(self.avail_member_dict)[self.rr_count + 1]
-                    print('Previous member:', list(self.avail_member_dict)[self.rr_count], 'Served member:', self.rr_member)
                     pickle.dump(self.rr_member, self.pickle_open)
                     self.pickle_open.close()
                     return list(self.avail_member_dict)[self.rr_count + 1]
@@ -111,4 +103,4 @@ class VIP:
 if __name__ == "__main__":
     a = VIP()
     print("Service name:", a.service_name)
-    print("Your VIP returned member:", type(a.Healthcheck()))
+    print("Your VIP returned member:", a.Healthcheck()+':{}'.format(a.avail_member_dict[a.rr_member][1]))
