@@ -38,7 +38,8 @@ class VIP:
         if path.exists(self.pickle_cwd_file) == False:          # instantiate pickle file, and write first available member to first line
             with open(self.pickle_cwd_file, 'wb+') as write_pickle:
                 pickle.dump(self.first_rr_member, write_pickle)
-            return self.first_rr_member
+            self.rr_member = self.first_rr_member
+            return self.rr_member
 
         else:       # pickle file already instantiated
             self.rr_member = self.Roundrobin()
