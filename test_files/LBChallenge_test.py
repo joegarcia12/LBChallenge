@@ -71,12 +71,12 @@ class VIP:
 
     def Roundrobin(self):
         self.pickle_open = open(self.pickle_cwd_file, 'rb')
-        #try:
-        self.pickle_data = pickle.load(self.pickle_open)
+        try:
+            self.pickle_data = pickle.load(self.pickle_open)
 
-        #except EOFError:
-         #   self.pickle_data
-        print("Pickle data within Roundrobin function, type:", self.pickle_data, type(self.pickle_data))
+        except EOFError:        # handles the corner case where the 'rr_state.pk' file exists, but is empty
+            self.pickle_data = self.first_rr_member
+            print("Pickle data within Roundrobin function, type:", self.pickle_data, type(self.pickle_data))
         self.pickle_open.close()
 
 
@@ -84,8 +84,6 @@ class VIP:
         # RR Case 1: return the same member if only 1 member is available
         if len(self.avail_member_dict) == 1:
             return list(self.avail_member_dict)[0]
-
-        # RR Case 1.5: return first available member if pickle file is empty or does not match any member (ie was modified somehow)
 
         # RR Case 2: return first available member to complete the 'round-robin' cycle
         elif self.pickle_data == list(self.avail_member_dict.keys())[int(self.avail_member_total - 1)]:
@@ -113,4 +111,4 @@ class VIP:
 if __name__ == "__main__":
     a = VIP()
     print("Service name:", a.service_name)
-    print("Your load balanced member is:", a.Healthcheck())
+    print("Your VIP returned member:", type(a.Healthcheck()))
