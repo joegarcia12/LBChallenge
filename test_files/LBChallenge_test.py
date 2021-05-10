@@ -111,4 +111,4 @@ class VIP:
 if __name__ == "__main__":
     a = VIP()
     print("Service name:", a.service_name)
-    print("Your VIP returned member:", type(a.Healthcheck()))
+    print("Your VIP returned member:", a.Healthcheck())
