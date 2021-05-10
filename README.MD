@@ -1,5 +1,4 @@
 # LBChallenge.py Overview
-=========================
 
 The LBChallenge Python module simulates a load balancer, reverse proxying traffic to a backend pool member that is available each run.
 
@@ -34,7 +33,6 @@ nc: connectx to 100.251.33.110 port 443 (tcp) failed: Operation timed out
 Connection to 52.5.196.118 port 443 [tcp/https] succeeded!
 Connection to 52.84.169.4 port 443 [tcp/https] succeeded!
 Your VIP returned member: splunk.com:443
-
 
 #### where only 1 member is available ####
 josephrgarcia-mbp:LBChallenge josephrgarcia$ python3 LBChallenge.py
